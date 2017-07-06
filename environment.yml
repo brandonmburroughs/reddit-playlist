@@ -1,3 +1,9 @@
-name: reddit-playlist
+name: reddit_playlist
 dependencies:
 - python=3
+- requests=2.12.4
+- pip
+- pip:
+    - google-api-python-client==1.6.2
+    - httplib2==0.10.3
+    - oauth2client==4.1.2
