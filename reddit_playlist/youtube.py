@@ -10,6 +10,8 @@ from oauth2client.tools import argparser, run_flow
 from httplib2 import Http
 from apiclient.discovery import build
 
+from database import DatabaseManager
+
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -32,6 +34,7 @@ class YouTube:
         self.youtube_api_service_name = "youtube"
         self.youtube_api_version = "v3"
         self.youtube = None
+        self.database = DatabaseManager("resources/reddit-playlist.db")
 
     def get_authenticated_service(self):
         """Authenticate with YouTube"""
@@ -104,13 +107,15 @@ class YouTube:
             part="snippet,status",
             body=playlist_resource
         ).execute()
+
+        self.database.insert_playlist(playlists_insert_response["id"], subreddit)
     
         logger.info("Created new playlist with id: %s" %
                     playlists_insert_response["id"])
     
         return playlists_insert_response["id"]
 
-    def add_video_to_playlist(self, video_id, playlist_id):
+    def add_video_to_playlist(self, video_id, playlist_id, reddit_post_url):
         """Add a single video an existing playlist.
         
         Parameters
@@ -137,7 +142,8 @@ class YouTube:
                 part="snippet",
                 body=playlist_item
             ).execute()
-    
+
+            self.database.insert_video(video_id, playlist_id, reddit_post_url)
             logger.info("Added video {} to playlist {}".format(video_id, playlist_id))
         except:
             logging.warning("Skipping video {}".format(video_id))
@@ -194,7 +200,8 @@ class YouTube:
         for new_video_id in video_id_list:
             if new_video_id not in current_video_ids:
                 self.add_video_to_playlist(video_id=new_video_id,
-                                           playlist_id=playlist_id)
+                                           playlist_id=playlist_id,
+                                           reddit_post_url="test")
             else:
                 logger.info("Skipping video {0} in playlist {1}".format(
                     new_video_id,
@@ -203,6 +210,22 @@ class YouTube:
     
         return None
 
+    @staticmethod
+    def get_playlist_url(playlist_id):
+        """Return a playlist url given a playlist id.
+        
+        Parameters
+        ----------
+        playlist_id : str
+        
+        Returns
+        -------
+        str
+            A playlist url
+        """
+        return "https://www.youtube.com/playlist?list={}".format(playlist_id)
+
+
 if __name__ == "__main__":
     youtube = YouTube("resources/client_secret.json")
     youtube.get_authenticated_service()
@@ -210,4 +233,5 @@ if __name__ == "__main__":
     playlist_id = youtube.create_playlist(subreddit="Test")
 
     youtube.add_video_to_playlist(video_id="qsMxUp82YeA",
-                                  playlist_id=playlist_id)
+                                  playlist_id=playlist_id,
+                                  reddit_post_url="test")
