@@ -68,6 +68,7 @@ def get_youtube_video_id_from_url(video_url):
 
     return video_id
 
+
 def filter_youtube_videos(posts):
     """Filter the list of posts to only contain YouTube videos.
     
@@ -93,3 +94,19 @@ def filter_youtube_videos(posts):
             logger.debug("NOT Youtube Post: {}".format(post["url"]))
 
     return youtube_posts
+
+
+def get_subreddit_url(subreddit_name):
+    """Get a subreddit url given a subreddit name.
+    
+    Parameters
+    ----------
+    subreddit_name : str
+        A subreddit name
+        
+    Returns
+    -------
+    str
+        A subreddit url
+    """
+    return "https://www.reddit.com/r/{}/".format(subreddit_name)
