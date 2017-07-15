@@ -52,12 +52,12 @@ def get_youtube_video_id_from_url(video_url):
     Parameters
     ----------
     video_url : str
-        a YouTube video url
+        A YouTube video url
     
     Returns
     -------
     str
-        the video id
+        The video id
     """
     if video_url.find("?v=") >= 0:
         video_id = video_url.split("?v=")[1].split("&")[0]
