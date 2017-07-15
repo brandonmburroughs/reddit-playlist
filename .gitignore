@@ -8,5 +8,6 @@ __pycache__
 # Environment
 .env
 
-# Credentials
+# Resources
 *.json
+*.db
