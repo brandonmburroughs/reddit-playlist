@@ -1,4 +1,4 @@
-name: reddit_playlist
+name: reddit-playlist
 dependencies:
 - python=3
 - requests=2.12.4
