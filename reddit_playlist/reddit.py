@@ -34,7 +34,11 @@ def get_top_subreddit_posts(subreddit, sort_by='hot', limit=50):
     logger.info("Response {} from {}".format(response.status_code, url))
 
     if response.ok:
-        posts = [post['data'] for post in response.json()['data']['children']]
+        if (response.json()['data']['children']) == 0 or response.json()['data']['children'][0]['kind'] != 't3':
+            logger.warning("{} is not a valid subreddit name!".format(subreddit))
+            raise Exception("{} is not a valid subreddit name!".format(subreddit))
+        else:
+            posts = [post['data'] for post in response.json()['data']['children']]
     else:
         error_message = "Expected status code 200, but got status code {}\n{}".format(
             response.status_code,
@@ -59,10 +63,13 @@ def get_youtube_video_id_from_url(video_url):
     str
         The video id
     """
+    logger.debug("YouTube video url {}".format(video_url))
     if video_url.find("?v=") >= 0:
         video_id = video_url.split("?v=")[1].split("&")[0]
     elif video_url.find("youtu.be") >= 0:
         video_id = video_url.split("youtu.be/")[1]
+    elif video_url.find("v%3D") >= 0:
+        video_id = video_url.split("v%3D")[1].split("%26")[0]
     else:
         raise Exception("Video id could not be found in {}!".format(video_url))
 
