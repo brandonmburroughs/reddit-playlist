@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Playlists created from subreddits">
+    <meta name="author" content="Brandon M. Burroughs">
+
+    <title>Reddit Playlists Daily</title>
+
+    <link rel='shortcut icon' href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon"/ >
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{{ url_for('static', filename='font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header id="top" class="header">
+        <div class="text-vertical-center">
+            <h1>/r/{{ subreddit_name }} Daily</h1>
+            <h3>Daily playlists brought to you by /r/{{ subreddit_name }}</h3>
+            <br>
+            <a href="#playlist" class="btn btn-dark btn-lg">Playlist</a>
+
+        </div>
+    </header>
+
+    <!-- Playlist -->
+    <section id="playlist" class="playlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10 text-vertical-center">
+                    <h2>Today's Playlist for
+                        <small>
+                            <span class="dropdown div-inline">
+                                <button class="btn btn-dark btn-lg dropdown-toggle" type="button" id="subreddit_dropdown" data-toggle="dropdown" style="white-space: normal;">/r/{{ subreddit_name }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for subreddit in subreddits_available %}
+                                        <li><a href="{{ url_for('subreddit_playlist', subreddit_name=subreddit) }}">/r/{{ subreddit }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </span>
+                        </small>
+                    </h2>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe id="embeddedPlaylist" class="embed-responsive-item" src="https://www.youtube.com/embed/videoseries?list={{ subreddit_playlist_url }}" allowfullscreen alt="Reddit Playlist"></iframe>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-sm-offset-1 col-sm-10 col-xs-offset-2 col-xs-8 text-vertical-center" id="buttons">
+                    <!-- Link to subreddit -->
+                    <a href="http://reddit.com/r/{{ subreddit_name }}" target="_blank" class="btn btn-dark btn-lg" style="display: inline-block">Subreddit</a>
+                    <!-- Link to previous playlists -->
+                    <a href="https://www.youtube.com/channel/UCL_u4TNAYqsHqOmf-30b2GA" target="_blank" class="btn btn-dark btn-lg" style="display: inline-block">Previous Playlists</a>
+                    <!-- Paypal donation button -->
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="display: inline-block">
+                        <input type="hidden" name="cmd" value="_donations">
+                        <input type="hidden" name="business" value="hiphopheadsdaily@gmail.com">
+                        <input type="hidden" name="lc" value="US">
+                        <input type="hidden" name="item_name" value="Hip Hop Heads Daily Playlist">
+                        <input type="hidden" name="no_note" value="0">
+                        <input type="hidden" name="currency_code" value="USD">
+                        <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
+                        <input class="btn btn-dark btn-lg" type="submit" value="Donate" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                    </form>
+                    <form class="form-inline" action="{{ url_for('add_subreddit') }}" method="post">
+                        <input class="form-control" type="text" size="45" name="subreddit_name" placeholder="Enter the subreddit name to create a new playlist!">
+                        <input class="btn btn-dark btn-lg" type="submit" value="Submit">
+                    </form>
+                </div>
+                <!-- /buttons -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <a href="mailto:hiphopheadsdaily@gmail.com" target="_blank">Report a problem</a>
+                </div>
+            </div>
+        </div>
+        <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script>
+    // Scrolls to the selected menu item on the page
+    $(function() {
+        $('a[href*=#]:not([href=#],[data-toggle],[data-target],[data-slide])').click(function() {
+            if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                if (target.length) {
+                    $('html,body').animate({
+                        scrollTop: target.offset().top
+                    }, 1000);
+                    return false;
+                }
+            }
+        });
+    });
+    //#to-top button appears after scrolling
+    var fixed = false;
+    $(document).scroll(function() {
+        if ($(this).scrollTop() > 250) {
+            if (!fixed) {
+                fixed = true;
+                // $('#to-top').css({position:'fixed', display:'block'});
+                $('#to-top').show("slow", function() {
+                    $('#to-top').css({
+                        position: 'fixed',
+                        display: 'block'
+                    });
+                });
+            }
+        } else {
+            if (fixed) {
+                fixed = false;
+                $('#to-top').hide("slow", function() {
+                    $('#to-top').css({
+                        display: 'none'
+                    });
+                });
+            }
+        }
+    });
+
+    // Google Analytics
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-86939070-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+</body>
+
+</html>

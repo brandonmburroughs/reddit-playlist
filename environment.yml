@@ -2,6 +2,7 @@ name: reddit-playlist
 dependencies:
 - python=3
 - requests=2.12.4
+- flask=0.12.2
 - pip
 - pip:
     - google-api-python-client==1.6.2
