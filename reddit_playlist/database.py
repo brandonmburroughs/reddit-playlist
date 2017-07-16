@@ -28,18 +28,25 @@ class DatabaseManager:
         """Create subreddit_playlists and subreddit_playlist_videos tables."""
         self.cur.execute(
             """CREATE TABLE subreddit_playlists (
-            playlist_id text primary key,
-            date_created datetime,
-            subreddit_name text
+                playlist_id text primary key,
+                date_created datetime,
+                subreddit_name text
             )"""
         )
 
         self.cur.execute(
             """CREATE TABLE subreddit_playlist_videos (
-            video_id text primary key,
-            date_added datetime,
-            playlist_id text,
-            reddit_post_url text
+                video_id text primary key,
+                date_added datetime,
+                playlist_id text,
+                reddit_post_url text
+            )"""
+        )
+
+        self.cur.execute(
+            """CREATE TABLE subreddit_playlists_created (
+                subreddit_name text,
+                date_added datetime
             )"""
         )
 
@@ -49,6 +56,7 @@ class DatabaseManager:
         """Delete subreddit_playlists and subreddit_playlist_videos tables."""
         self.cur.execute("DROP TABLE IF EXISTS subreddit_playlists")
         self.cur.execute("DROP TABLE IF EXISTS subreddit_playlist_videos")
+        self.cur.execute("DROP TABLE IF EXISTS subreddit_playlists_created")
         self.conn.commit()
 
     def _reset_database(self):
@@ -81,6 +89,28 @@ class DatabaseManager:
     def __del__(self):
         """Close the database connection when the object is deleted."""
         self.conn.close()
+
+    def add_subreddit_to_db(self, subreddit_name):
+        """Add a subreddit to the list of subreddits in the db
+
+        Parameters
+        ----------
+        subreddit_name : str
+            The subreddit to be added
+
+        Returns
+        -------
+        None
+        """
+        self.query(
+            """
+            INSERT INTO subreddit_playlists_created (subreddit_name, date_added)
+            VALUES (?, ?)
+            """,
+            (subreddit_name, datetime.datetime.now())
+        )
+
+        return None
 
     def insert_playlist(self, playlist_id, subreddit_name):
         """Insert a created playlist into the subreddit_playlists table.
@@ -119,14 +149,19 @@ class DatabaseManager:
         str
             playlist_id
         """
-        return self.query(
+        response = self.query(
             """
             SELECT playlist_id
             FROM subreddit_playlists
             WHERE subreddit_name = ? AND DATE(date_created) = ?
             """,
             (subreddit_name, date)
-        ).fetchall()[0][0]
+        ).fetchall()
+
+        if len(response) > 0:
+            return response[0][0]
+        else:
+            return None
 
     def insert_video(self, video_id, playlist_id, reddit_post_url):
         """Insert a playlist video into the subreddit_playlist_videos table.
@@ -150,3 +185,15 @@ class DatabaseManager:
             """,
             (video_id, datetime.datetime.now(), playlist_id, reddit_post_url)
         )
+
+    def get_all_playlist_ids(self):
+        """Get all of the playlist ids."""
+        response = self.query(
+            """SELECT playlist_id
+            FROM subreddit_playlists
+            """
+        ).fetchall()
+
+        playlist_ids = [playlist_id[0] for playlist_id in response]
+
+        return playlist_ids
