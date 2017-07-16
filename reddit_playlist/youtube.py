@@ -49,7 +49,7 @@ class YouTube:
             credentials = run_flow(flow, storage, flags)
 
         self.youtube = build(self.youtube_api_service_name, self.youtube_api_version,
-                             http=credentials.authorize(Http()))
+                             http=credentials.authorize(Http()), cache_discovery=False)
 
     @staticmethod
     def _build_resource(properties):
@@ -108,6 +108,7 @@ class YouTube:
             body=playlist_resource
         ).execute()
 
+        self.database.add_subreddit_to_db(subreddit)
         self.database.insert_playlist(playlists_insert_response["id"], subreddit)
     
         logger.info("Created new playlist with id: %s" %
@@ -150,13 +151,15 @@ class YouTube:
     
         return None
     
-    def get_playlist_id_for_today(self, subreddit):
+    def get_playlist_id_for_today(self, subreddit, date=datetime.datetime.now().date()):
         """Get the playlist id for today's playlist.
     
         Parameters
         ----------
         subreddit : str
             Subreddit name
+        date : date object
+            The date to search for, defaults to today
     
         Returns
         -------
@@ -168,9 +171,11 @@ class YouTube:
         ).execute()
     
         for playlist in playlist_ids['items']:
-            if str(datetime.datetime.now().date()) in playlist['snippet']['title'] and \
+            if str(date) in playlist['snippet']['title'] and \
                     subreddit in playlist['snippet']['title']:
                 return playlist['id']
+
+        return None
 
     def bulk_add_videos_to_playlist(self, video_id_list, playlist_id):
         """Add several videos to a playlist.
@@ -225,6 +230,30 @@ class YouTube:
         """
         return "https://www.youtube.com/playlist?list={}".format(playlist_id)
 
+    def _delete_playlist(self, playlist_id):
+        """Delete a given playlist.
+        
+        Parameters
+        ----------
+        playlist_id : str
+            A YouTube playlist id
+
+        Returns
+        -------
+        None
+        """
+        self.youtube.playlists().delete(id=playlist_id).execute()
+
+        return None
+
+    def _delete_all_playlists(self):
+        """Delete all of the playlists in the database."""
+        playlist_ids = self.database.get_all_playlist_ids()
+        for playlist_id in playlist_ids:
+            logger.info("Deleting playlist {}".format(playlist_id))
+            self._delete_playlist(playlist_id)
+
+        return None
 
 if __name__ == "__main__":
     youtube = YouTube("resources/client_secret.json")
