@@ -1,0 +1,1 @@
+web: gunicorn --chdir reddit_playlist app:app --log-file -
