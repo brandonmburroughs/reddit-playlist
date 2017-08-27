@@ -1,5 +1,5 @@
 """YouTube API interactions."""
-
+import os
 import datetime
 import logging
 import sys
@@ -30,14 +30,37 @@ class YouTube:
             The path to the YouTube JSON credentials file
         """
         self.client_secrets_file = client_secrets_file
+        self._create_secrets_file(client_secrets_file)
         self.youtube_scope = 'https://www.googleapis.com/auth/youtube'
         self.youtube_api_service_name = "youtube"
         self.youtube_api_version = "v3"
         self.youtube = None
         self.database = database.DatabaseManager()
 
+    def _create_secrets_file(self, client_secrets_file):
+        """Create a secrets file from the environment variables since the flow needs one.
+        
+        Parameters
+        ----------
+        client_secrets_file : str
+            The path to the credentials file
+        """
+        if not os.path.exists("resources"):
+            os.makedirs("resources")
+        with open(client_secrets_file, "w") as f:
+            f.write(os.environ["CLIENT_SECRET"])
+
+    def _create_token_file(self):
+        """Create a token file for YouTube."""
+        path, python_file = sys.argv[0].rsplit("/", 1)
+        if not os.path.exists("{}/resources".format(path)):
+            os.makedirs("{}/resources".format(path))
+        with open("{}/resources/{}-oauth2.json".format(path, python_file), "w") as f:
+            f.write(os.environ["YOUTUBE_TOKEN"])
+
     def get_authenticated_service(self):
         """Authenticate with YouTube"""
+        self._create_token_file()
         flow = flow_from_clientsecrets(self.client_secrets_file, scope=self.youtube_scope)
 
         path, python_file = sys.argv[0].rsplit("/", 1)
