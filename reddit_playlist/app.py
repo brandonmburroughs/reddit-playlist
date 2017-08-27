@@ -80,6 +80,7 @@ def create_and_or_update_playlist(subreddit_name):
 
 def get_subreddits_available_in_db():
     """Get all of the subreddit names that are in the database."""
+    logger.info("Getting subreddit playlists")
     db = database.DatabaseManager()
     response = db.query(
         """
@@ -98,7 +99,7 @@ def bulk_create_and_or_update_playlists():
     """Get all subreddits and bulk update the playlists."""
     subreddit_names = get_subreddits_available_in_db()
     for subreddit_name in subreddit_names:
-        logger.debug("Updating videos for {}!".format(subreddit_name))
+        logger.info("Updating videos for {}!".format(subreddit_name))
         create_and_or_update_playlist(subreddit_name)
 
 

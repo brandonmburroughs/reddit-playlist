@@ -30,6 +30,7 @@ def get_top_subreddit_posts(subreddit, sort_by='hot', limit=50):
 
     url = "https://www.reddit.com/r/{}/{}/.json?limit={}".format(subreddit, sort_by, limit - 2)
 
+    logger.info("Getting top {} posts from subreddit /r/{}".format(limit, subreddit))
     response = requests.get(url, headers=headers)
     logger.info("Response {} from {}".format(response.status_code, url))
 
@@ -91,6 +92,7 @@ def filter_youtube_videos(posts):
     """
     youtube_bases = ['youtube.com', 'youtu.be']
 
+    logger.info("Getting youtube videos from Reddit posts!")
     youtube_posts = []
     for post in posts:
         if any([base in post["url"] for base in youtube_bases]) and "playlist" not in post["url"]:

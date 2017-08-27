@@ -74,12 +74,15 @@ class DatabaseManager:
 
         self.conn.commit()
 
+        logger.info("Created tables!")
+
     def _delete_tables(self):
         """Delete subreddit_playlists and subreddit_playlist_videos tables."""
         self.cur.execute("DROP TABLE IF EXISTS subreddit_playlists")
         self.cur.execute("DROP TABLE IF EXISTS subreddit_playlist_videos")
         self.cur.execute("DROP TABLE IF EXISTS subreddit_playlists_created")
         self.conn.commit()
+        logger.info("Deleted tables!")
 
     def _reset_database(self):
         """Delete and recreate tables."""
@@ -113,6 +116,7 @@ class DatabaseManager:
             cursor.execute(sql, parameters)
         self.conn.commit()
 
+        logger.debug("Executed query\n{}\nwith parameters\n{}".format(sql, parameters))
         return cursor
 
     def __del__(self):
@@ -138,6 +142,7 @@ class DatabaseManager:
             """,
             (subreddit_name, datetime.datetime.now())
         )
+        logger.info("Added subreddit {} to the database!".format(subreddit_name))
 
         return None
 
@@ -162,6 +167,7 @@ class DatabaseManager:
             """,
             (playlist_id, datetime.datetime.now(), subreddit_name)
         )
+        logger.info("Added playlist {} for subreddit {} to database".format(playlist_id, subreddit_name))
 
     def get_playlist_id(self, subreddit_name, date=datetime.datetime.now().date()):
         """Get the playlist for a particular subreddit and date.

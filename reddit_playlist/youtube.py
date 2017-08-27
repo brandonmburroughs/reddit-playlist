@@ -60,6 +60,7 @@ class YouTube:
 
     def get_authenticated_service(self):
         """Authenticate with YouTube"""
+        logger.info("Getting authenticated YouTube service!")
         self._create_token_file()
         flow = flow_from_clientsecrets(self.client_secrets_file, scope=self.youtube_scope)
 
@@ -119,6 +120,7 @@ class YouTube:
         str
             The playlist id
         """
+        logger.info("Creating playlist for the subreddit {}!".format(subreddit))
         playlist_resource = self._build_resource(
             {
                 "snippet.title": "{} playlist for {}".format(subreddit, date),
@@ -134,8 +136,8 @@ class YouTube:
         self.database.add_subreddit_to_db(subreddit)
         self.database.insert_playlist(playlists_insert_response["id"], subreddit)
     
-        logger.info("Created new playlist with id: %s" %
-                    playlists_insert_response["id"])
+        logger.info("Created new playlist with id: {}".format(
+                    playlists_insert_response["id"]))
     
         return playlists_insert_response["id"]
 
@@ -154,6 +156,7 @@ class YouTube:
         None
         """
         try:
+            logger.debug("Adding video {} to playlist {}".format(video_id, playlist_id))
             playlist_item = self._build_resource(
                 {
                     'snippet.playlistId': playlist_id,
@@ -220,7 +223,8 @@ class YouTube:
             playlistId=playlist_id,
             maxResults=50
         ).execute()
-    
+
+        logger.info("Adding videos to playlist {}".format(playlist_id))
         current_video_ids = []
         for video in response['items']:
             current_video_ids.append(video['snippet']['resourceId']['videoId'])
