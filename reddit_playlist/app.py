@@ -1,6 +1,6 @@
 import datetime
 import logging
-from sqlite3 import dbapi2 as sqlite3
+import argparse
 from flask import Flask, g, request, flash, render_template, redirect, url_for
 
 from reddit_playlist import database
@@ -123,5 +123,17 @@ def index():
     return "Hello, world!"
 
 
+def parse_args():
+    """Parse the CLI args"""
+    parser = argparse.ArgumentParser(description='Update all of the playlists')
+    parser.add_argument("--update-playlists", dest="update_playlist", default=False, action="store_true",
+                        help="Update all of the playlists (default: False)")
+
+    return parser.parse_args()
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    args = parse_args()
+    if args.update_playlist:
+        bulk_create_and_or_update_playlists()
+    else:
+        app.run(host="0.0.0.0")

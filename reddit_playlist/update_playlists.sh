@@ -1,0 +1,1 @@
+python reddit_playlist/app.py --update-playlists
