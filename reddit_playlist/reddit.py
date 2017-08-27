@@ -64,8 +64,8 @@ def get_youtube_video_id_from_url(video_url):
         The video id
     """
     logger.debug("YouTube video url {}".format(video_url))
-    if video_url.find("?v=") >= 0:
-        video_id = video_url.split("?v=")[1].split("&")[0]
+    if video_url.find("v=") >= 0:
+        video_id = video_url.split("v=")[1].split("&")[0]
     elif video_url.find("youtu.be") >= 0:
         video_id = video_url.split("youtu.be/")[1]
     elif video_url.find("v%3D") >= 0:
@@ -94,7 +94,10 @@ def filter_youtube_videos(posts):
     youtube_posts = []
     for post in posts:
         if any([base in post["url"] for base in youtube_bases]) and "playlist" not in post["url"]:
-            post["video_id"] = get_youtube_video_id_from_url(post["url"])
+            try:
+                post["video_id"] = get_youtube_video_id_from_url(post["url"])
+            except Exception as e:
+                logger.warning(e)
             youtube_posts.append(post)
             logger.debug("Youtube Post: {}".format(post["url"]))
         else:

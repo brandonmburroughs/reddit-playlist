@@ -10,7 +10,7 @@ from oauth2client.tools import argparser, run_flow
 from httplib2 import Http
 from apiclient.discovery import build
 
-from database import DatabaseManager
+from reddit_playlist import database
 
 
 # Set up logging
@@ -34,7 +34,7 @@ class YouTube:
         self.youtube_api_service_name = "youtube"
         self.youtube_api_version = "v3"
         self.youtube = None
-        self.database = DatabaseManager("resources/reddit-playlist.db")
+        self.database = database.DatabaseManager()
 
     def get_authenticated_service(self):
         """Authenticate with YouTube"""

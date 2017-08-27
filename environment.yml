@@ -4,6 +4,7 @@ dependencies:
 - requests=2.12.4
 - flask=0.12.2
 - gunicorn=19.1.0
+- psycopg2=2.7.1
 - pip
 - pip:
     - google-api-python-client==1.6.2

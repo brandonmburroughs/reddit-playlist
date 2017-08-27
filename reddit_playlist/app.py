@@ -3,8 +3,9 @@ import logging
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, g, request, flash, render_template, redirect, url_for
 
-import reddit
-import youtube
+from reddit_playlist import database
+from reddit_playlist import reddit
+from reddit_playlist import youtube
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -13,22 +14,6 @@ logger = logging.getLogger(__name__)
 # Set up app
 app = Flask(__name__)
 app.secret_key = 'some secret'
-
-
-def connect_db():
-    """Connects to the specific database."""
-    rv = sqlite3.connect("resources/reddit-playlist.db")
-    rv.row_factory = sqlite3.Row
-    return rv
-
-
-def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
 
 
 def get_playlist_id(subreddit_name, date=datetime.datetime.now().date()):
@@ -46,12 +31,12 @@ def get_playlist_id(subreddit_name, date=datetime.datetime.now().date()):
     str
         playlist_id
     """
-    db = get_db()
-    response = db.execute(
+    db = database.DatabaseManager()
+    response = db.query(
         """
         SELECT playlist_id
         FROM subreddit_playlists
-        WHERE subreddit_name = ? AND DATE(date_created) = ?
+        WHERE subreddit_name = %s AND DATE(date_created) = %s
         """,
         (subreddit_name, date)
     ).fetchall()
@@ -95,8 +80,8 @@ def create_and_or_update_playlist(subreddit_name):
 
 def get_subreddits_available_in_db():
     """Get all of the subreddit names that are in the database."""
-    db = get_db()
-    response = db.execute(
+    db = database.DatabaseManager()
+    response = db.query(
         """
         SELECT subreddit_name
         FROM subreddit_playlists_created
