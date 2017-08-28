@@ -84,7 +84,7 @@ def get_subreddits_available_in_db():
     db = database.DatabaseManager()
     response = db.query(
         """
-        SELECT subreddit_name
+        SELECT DISTINCT subreddit_name
         FROM subreddit_playlists_created
         ORDER BY subreddit_name ASC
         """
