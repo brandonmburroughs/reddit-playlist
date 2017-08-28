@@ -45,7 +45,7 @@ def get_top_subreddit_posts(subreddit, sort_by='hot', limit=50):
             response.status_code,
             response.text
         )
-        logger.error(error_message)
+        logger.error(error_message, exec_info=True)
         raise requests.ConnectionError(error_message)
 
     return posts
