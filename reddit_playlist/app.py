@@ -120,8 +120,7 @@ def add_subreddit():
 
 @app.route('/')
 def index():
-    bulk_create_and_or_update_playlists()
-    return "Hello, world!"
+    return redirect(url_for('subreddit_playlist', subreddit_name="punk"))
 
 
 def parse_args():
