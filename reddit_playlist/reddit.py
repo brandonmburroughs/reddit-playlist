@@ -98,10 +98,10 @@ def filter_youtube_videos(posts):
         if any([base in post["url"] for base in youtube_bases]) and "playlist" not in post["url"]:
             try:
                 post["video_id"] = get_youtube_video_id_from_url(post["url"])
+                youtube_posts.append(post)
+                logger.debug("Youtube Post: {}".format(post["url"]))
             except Exception as e:
                 logger.warning(e)
-            youtube_posts.append(post)
-            logger.debug("Youtube Post: {}".format(post["url"]))
         else:
             logger.debug("NOT Youtube Post: {}".format(post["url"]))
 
