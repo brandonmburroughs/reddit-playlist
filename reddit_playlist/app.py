@@ -112,7 +112,7 @@ def subreddit_playlist(subreddit_name):
 
 @app.route('/add', methods=['POST'])
 def add_subreddit():
-    subreddit_name = request.form['subreddit_name']
+    subreddit_name = request.form['subreddit_name'].split("r/")[-1]
     flash("%s was added to the list of subreddit playlists!".format(subreddit_name))
     create_and_or_update_playlist(subreddit_name)
 
